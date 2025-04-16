@@ -1,0 +1,724 @@
+Try: sudo apt install <deb name>
+vishnu@Lenovo:~$ docker network inspect bridge
+[
+    {
+        "Name": "bridge",
+        "Id": "1ca15ec2f096257c8647e749b3d6209c933b6312fcd4d5c0cfb56ef6706c1e86",
+        "Created": "2025-04-16T17:43:33.120482828Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "1500"
+        },
+        "Labels": {}
+    }
+]
+vishnu@Lenovo:~$ docker network ls
+NETWORK ID     NAME                DRIVER    SCOPE
+1ca15ec2f096   bridge              bridge    local
+b6fcc2cfecd1   host                host      local
+32354eda611c   my_custom_network   bridge    local
+11a78871f4c9   none                null      local
+vishnu@Lenovo:~$ docker network create mynet1
+1c00765d01337b84d320f6cea2c05e5114c506bbf5c64f667488aa72890966a9
+vishnu@Lenovo:~$ docker network ls
+NETWORK ID     NAME                DRIVER    SCOPE
+1ca15ec2f096   bridge              bridge    local
+b6fcc2cfecd1   host                host      local
+32354eda611c   my_custom_network   bridge    local
+1c00765d0133   mynet1              bridge    local
+11a78871f4c9   none                null      local
+vishnu@Lenovo:~$ docker run -d --name nginx-net --network mynet1 nginx
+Unable to find image 'nginx:latest' locally
+latest: Pulling from library/nginx
+8a628cdd7ccc: Pull complete
+75b642592991: Pull complete
+553c8756fd66: Pull complete
+10fe6d2248e3: Pull complete
+3b6e18ae4ce6: Pull complete
+3dce86e3b082: Pull complete
+e81a6b82cf64: Pull complete
+Digest: sha256:09369da6b10306312cd908661320086bf87fbae1b6b0c49a1f50ba531fef2eab
+Status: Downloaded newer image for nginx:latest
+fcfb67969c719163252d884625cfc5d43ff41f1ae23807ac967e4485c5c39392
+vishnu@Lenovo:~$ docker network ls
+NETWORK ID     NAME                DRIVER    SCOPE
+1ca15ec2f096   bridge              bridge    local
+b6fcc2cfecd1   host                host      local
+32354eda611c   my_custom_network   bridge    local
+1c00765d0133   mynet1              bridge    local
+11a78871f4c9   none                null      local
+vishnu@Lenovo:~$ docker ps -a
+CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS                       PORTS     NAMES
+fcfb67969c71   nginx         "/docker-entrypoint.…"   54 seconds ago   Up 53 seconds                80/tcp    nginx-net
+e6f2861db819   alpine        "sh"                     17 minutes ago   Exited (255) 5 minutes ago             container1
+9d294ebec047   alpine        "sh"                     21 minutes ago   Exited (255) 5 minutes ago             container2
+9a6bf9092599   hello-world   "/hello"                 37 minutes ago   Exited (0) 37 minutes ago              suspicious_almeida
+vishnu@Lenovo:~$ docker images
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+alpine        latest    aded1e1a5b37   2 months ago   7.83MB
+nginx         latest    4cad75abc83d   2 months ago   192MB
+hello-world   latest    74cc54e27dc4   2 months ago   10.1kB
+vishnu@Lenovo:~$ docker run -it --rm --network mynet1 busybox sh
+Unable to find image 'busybox:latest' locally
+latest: Pulling from library/busybox
+97e70d161e81: Pull complete
+Digest: sha256:37f7b378a29ceb4c551b1b5582e27747b855bbfaa73fa11914fe0df028dc581f
+Status: Downloaded newer image for busybox:latest
+/ # ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0@if13: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue
+    link/ether 82:b5:09:b2:1a:70 brd ff:ff:ff:ff:ff:ff
+    inet 172.20.0.3/16 brd 172.20.255.255 scope global eth0
+       valid_lft forever preferred_lft forever
+/ # ping container1
+ping: bad address 'container1'
+/ # docker ps
+sh: docker: not found
+/ # docker ps
+sh: docker: not found
+/ # exit
+vishnu@Lenovo:~$ sudo -i
+[sudo] password for vishnu:
+root@Lenovo:~# docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS     NAMES
+fcfb67969c71   nginx     "/docker-entrypoint.…"   10 minutes ago   Up 10 minutes   80/tcp    nginx-net
+root@Lenovo:~# docker inspect container1
+[
+    {
+        "Id": "e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f",
+        "Created": "2025-04-16T17:31:55.425693208Z",
+        "Path": "sh",
+        "Args": [],
+        "State": {
+            "Status": "exited",
+            "Running": false,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 0,
+            "ExitCode": 255,
+            "Error": "",
+            "StartedAt": "2025-04-16T17:31:55.543409598Z",
+            "FinishedAt": "2025-04-16T17:43:30.677855023Z"
+        },
+        "Image": "sha256:aded1e1a5b3705116fa0a92ba074a5e0b0031647d9c315983ccba2ee5428ec8b",
+        "ResolvConfPath": "/var/lib/docker/containers/e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f/hostname",
+        "HostsPath": "/var/lib/docker/containers/e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f/hosts",
+        "LogPath": "/var/lib/docker/containers/e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f/e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f-json.log",
+        "Name": "/container1",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "my_custom_network",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                49,
+                211
+            ],
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "host",
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": null,
+            "Ulimits": [],
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware",
+                "/sys/devices/virtual/powercap"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "ID": "e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f",
+                "LowerDir": "/var/lib/docker/overlay2/56529adac5538773ee75522d3863ef7c616d793a9412900c092b72fa52596d06-init/diff:/var/lib/docker/overlay2/fe1b0a215390bfc6b9bdda66cbb9e6cd530ce0f777c74f37c43c5920bb102597/diff",
+                "MergedDir": "/var/lib/docker/overlay2/56529adac5538773ee75522d3863ef7c616d793a9412900c092b72fa52596d06/merged",
+                "UpperDir": "/var/lib/docker/overlay2/56529adac5538773ee75522d3863ef7c616d793a9412900c092b72fa52596d06/diff",
+                "WorkDir": "/var/lib/docker/overlay2/56529adac5538773ee75522d3863ef7c616d793a9412900c092b72fa52596d06/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [],
+        "Config": {
+            "Hostname": "e6f2861db819",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": true,
+            "OpenStdin": true,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "sh"
+            ],
+            "Image": "alpine",
+            "Volumes": null,
+            "WorkingDir": "/",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {}
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "",
+            "SandboxKey": "",
+            "Ports": {},
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "my_custom_network": {
+                    "IPAMConfig": {},
+                    "Links": null,
+                    "Aliases": [],
+                    "MacAddress": "",
+                    "DriverOpts": {},
+                    "GwPriority": 0,
+                    "NetworkID": "32354eda611cb6b08c8669d7df7a5a4cf075f2d203dbf20b6c88c9b37b8a9f91",
+                    "EndpointID": "",
+                    "Gateway": "",
+                    "IPAddress": "",
+                    "IPPrefixLen": 0,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": [
+                        "container1",
+                        "e6f2861db819"
+                    ]
+                }
+            }
+        }
+    }
+]
+root@Lenovo:~# docker start container1
+container1
+root@Lenovo:~# docker run -dit --name container1 --network mynet1 busybox sh
+docker: Error response from daemon: Conflict. The container name "/container1" is already in use by container "e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f". You have to remove (or rename) that container to be able to reuse that name.
+
+Run 'docker run --help' for more information
+root@Lenovo:~# docker start container1
+container1
+root@Lenovo:~# docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS              PORTS     NAMES
+fcfb67969c71   nginx     "/docker-entrypoint.…"   12 minutes ago   Up 12 minutes       80/tcp    nginx-net
+e6f2861db819   alpine    "sh"                     29 minutes ago   Up About a minute             container1
+root@Lenovo:~# ping container1
+ping: container1: Temporary failure in name resolution
+root@Lenovo:~# docker run -it --rm --network mynet1 busybox sh
+/ # ping container1
+
+ping: bad address 'container1'
+/ #
+/ # exit
+root@Lenovo:~# docker inspect container1 | grep -i "network"
+            "NetworkMode": "my_custom_network",
+        "NetworkSettings": {
+            "Networks": {
+                "my_custom_network": {
+                    "NetworkID": "32354eda611cb6b08c8669d7df7a5a4cf075f2d203dbf20b6c88c9b37b8a9f91",
+root@Lenovo:~# docker run -it --rm --network mynet1 busybox sh
+/ # exit
+root@Lenovo:~# docker run -it --rm --network my_custom_network busybox sh
+/ # ping container1
+PING container1 (172.18.0.2): 56 data bytes
+64 bytes from 172.18.0.2: seq=0 ttl=64 time=0.654 ms
+64 bytes from 172.18.0.2: seq=1 ttl=64 time=0.272 ms
+64 bytes from 172.18.0.2: seq=2 ttl=64 time=0.271 ms
+64 bytes from 172.18.0.2: seq=3 ttl=64 time=0.262 ms
+64 bytes from 172.18.0.2: seq=4 ttl=64 time=0.436 ms
+^C
+--- container1 ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max = 0.262/0.379/0.654 ms
+/ # exit
+root@Lenovo:~# docker network connect mynet nginx1
+Error response from daemon: No such container: nginx1
+root@Lenovo:~# docker network ls
+NETWORK ID     NAME                DRIVER    SCOPE
+1ca15ec2f096   bridge              bridge    local
+b6fcc2cfecd1   host                host      local
+32354eda611c   my_custom_network   bridge    local
+1c00765d0133   mynet1              bridge    local
+11a78871f4c9   none                null      local
+root@Lenovo:~# docker network connect mynet1 nginx1
+Error response from daemon: No such container: nginx1
+root@Lenovo:~# docker ps -a
+CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS                        PORTS     NAMES
+fcfb67969c71   nginx         "/docker-entrypoint.…"   20 minutes ago   Up 20 minutes                 80/tcp    nginx-net
+e6f2861db819   alpine        "sh"                     36 minutes ago   Up 8 minutes                            container1
+9d294ebec047   alpine        "sh"                     40 minutes ago   Exited (255) 25 minutes ago             container2
+9a6bf9092599   hello-world   "/hello"                 57 minutes ago   Exited (0) 57 minutes ago               suspicious_almeida
+root@Lenovo:~# docker network connect my_custom_network nginx-net
+root@Lenovo:~# docker network inspect my_custom_network
+[
+    {
+        "Name": "my_custom_network",
+        "Id": "32354eda611cb6b08c8669d7df7a5a4cf075f2d203dbf20b6c88c9b37b8a9f91",
+        "Created": "2025-04-16T17:26:12.830903802Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f": {
+                "Name": "container1",
+                "EndpointID": "72af31e73dba286f8dbec42691ceca96bfe7d4bdd3733742ed8b99b5e100298c",
+                "MacAddress": "8e:f1:80:c0:43:01",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": ""
+            },
+            "fcfb67969c719163252d884625cfc5d43ff41f1ae23807ac967e4485c5c39392": {
+                "Name": "nginx-net",
+                "EndpointID": "3e5a5d867a4f1557dd07193e6eb2e63e1fca243f1279662d84c5a7930a87c293",
+                "MacAddress": "ee:27:32:74:d5:53",
+                "IPv4Address": "172.18.0.3/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    }
+]
+root@Lenovo:~# docker run -it --rm --network my_custom_network busybox sh
+/ # # ping by hostname
+/ # ping nginx-net
+he web server
+wget -qO- http://nginx-net
+PING nginx-net (172.18.0.3): 56 data bytes
+64 bytes from 172.18.0.3: seq=0 ttl=64 time=1.969 ms
+64 bytes from 172.18.0.3: seq=1 ttl=64 time=0.491 ms
+64 bytes from 172.18.0.3: seq=2 ttl=64 time=0.269 ms
+64 bytes from 172.18.0.3: seq=3 ttl=64 time=0.288 ms
+64 bytes from 172.18.0.3: seq=4 ttl=64 time=0.292 ms
+^C
+--- nginx-net ping statistics ---
+5 packets transmitted, 5 packets received, 0% packet loss
+round-trip min/avg/max = 0.269/0.661/1.969 ms
+/ # exit
+root@Lenovo:~# docker network disconnect mynet nginx1
+Error response from daemon: No such container: nginx1
+root@Lenovo:~# docker ps -a
+CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS                        PORTS     NAMES
+fcfb67969c71   nginx         "/docker-entrypoint.…"   21 minutes ago   Up 21 minutes                 80/tcp    nginx-net
+e6f2861db819   alpine        "sh"                     38 minutes ago   Up 10 minutes                           container1
+9d294ebec047   alpine        "sh"                     42 minutes ago   Exited (255) 27 minutes ago             container2
+9a6bf9092599   hello-world   "/hello"                 58 minutes ago   Exited (0) 58 minutes ago               suspicious_almeida
+root@Lenovo:~# docker network disconnect mynet1 nginx-net
+root@Lenovo:~# docker network rm mynet1 nginx-net
+mynet1
+Error response from daemon: network nginx-net not found
+exit status 1
+root@Lenovo:~# docker network rm mynet1
+Error response from daemon: network mynet1 not found
+exit status 1
+root@Lenovo:~# docker ps -a
+CONTAINER ID   IMAGE         COMMAND                  CREATED             STATUS                         PORTS     NAMES
+fcfb67969c71   nginx         "/docker-entrypoint.…"   25 minutes ago      Up 25 minutes                  80/tcp    nginx-net
+e6f2861db819   alpine        "sh"                     41 minutes ago      Up 13 minutes                            container1
+9d294ebec047   alpine        "sh"                     45 minutes ago      Exited (255) 30 minutes ago              container2
+9a6bf9092599   hello-world   "/hello"                 About an hour ago   Exited (0) About an hour ago             suspicious_almeida
+root@Lenovo:~# docker rm nginx-net
+Error response from daemon: cannot remove container "/nginx-net": container is running: stop the container before removing or force remove
+root@Lenovo:~# docker stop nginx-net
+nginx-net
+root@Lenovo:~# docker rm nginx-net
+nginx-net
+root@Lenovo:~# docker rm container1
+Error response from daemon: cannot remove container "/container1": container is running: stop the container before removing or force remove
+root@Lenovo:~# docker stop container1
+container1
+root@Lenovo:~# docker rm container1
+container1
+root@Lenovo:~# docker run -d --rm --network host nginx
+5dcd19f06a7b3af8305cb53cd06cc08c8e23b19c22dd78c84d03f483652d6c6d
+root@Lenovo:~# docker inspect host nginx
+[
+    {
+        "Name": "host",
+        "Id": "b6fcc2cfecd14c45fecdd2f8fc59f3dc2e5c767d507eed21094b71faae274584",
+        "Created": "2025-04-16T17:10:12.93652049Z",
+        "Scope": "local",
+        "Driver": "host",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": null
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "5dcd19f06a7b3af8305cb53cd06cc08c8e23b19c22dd78c84d03f483652d6c6d": {
+                "Name": "upbeat_meitner",
+                "EndpointID": "e50d7785a75a72387849cfad645c577c2a96e2f873acd07a276c5740f73d39ab",
+                "MacAddress": "",
+                "IPv4Address": "",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    },
+    {
+        "Id": "sha256:4cad75abc83d5ca6ee22053d85850676eaef657ee9d723d7bef61179e1e1e485",
+        "RepoTags": [
+            "nginx:latest"
+        ],
+        "RepoDigests": [
+            "nginx@sha256:09369da6b10306312cd908661320086bf87fbae1b6b0c49a1f50ba531fef2eab"
+        ],
+        "Parent": "",
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2025-02-05T21:27:16Z",
+        "DockerVersion": "",
+        "Author": "",
+        "Config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "80/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NGINX_VERSION=1.27.4",
+                "NJS_VERSION=0.8.9",
+                "NJS_RELEASE=1~bookworm",
+                "PKG_RELEASE=1~bookworm",
+                "DYNPKG_RELEASE=1~bookworm"
+            ],
+            "Cmd": [
+                "nginx",
+                "-g",
+                "daemon off;"
+            ],
+            "Image": "",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": [
+                "/docker-entrypoint.sh"
+            ],
+            "OnBuild": null,
+            "Labels": {
+                "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+            },
+            "StopSignal": "SIGQUIT"
+        },
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 192056179,
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/2e6c9bab42f71f413765ea5eaff0524a5117a96641e1b8964530f6dea09c254a/diff:/var/lib/docker/overlay2/ed67ff930d4134bf2915872914337043f58bcdcfbe522a4600bf43c90d0e633a/diff:/var/lib/docker/overlay2/a650b2636c8b59f4f28c910472383a419d90bba5d81f7dd66ed5c9783b116ba3/diff:/var/lib/docker/overlay2/4b76bf13a07797e3a7968ad80f0d81188a43b424ef95e7d38317fc49d0f65da9/diff:/var/lib/docker/overlay2/c437846aaa4c0aa3c47d9013293ff80fbf83d09fd33bf483011ea789403ba184/diff:/var/lib/docker/overlay2/af573bb5fc84f8f3c4cba5483edd15161ee061406b8566ec5b12b557fa4e78bb/diff",
+                "MergedDir": "/var/lib/docker/overlay2/78dcc8aa9595988bac3384a815060b29b6ec64a242e74803de7254f2159af9ac/merged",
+                "UpperDir": "/var/lib/docker/overlay2/78dcc8aa9595988bac3384a815060b29b6ec64a242e74803de7254f2159af9ac/diff",
+                "WorkDir": "/var/lib/docker/overlay2/78dcc8aa9595988bac3384a815060b29b6ec64a242e74803de7254f2159af9ac/work"
+            },
+            "Name": "overlay2"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:ea680fbff095473bb8a6c867938d6d851e11ef0c177fce983ccc83440172bd72",
+                "sha256:c1a9699c65592e502a6b68876f5037b91972c4f72dac2e4e9b84f80f4b0790c2",
+                "sha256:d8d396eadc9a4f516284b8be48b1283f025d392c19e84c1c00e1187fe70bba53",
+                "sha256:27f473333e2f615c75d1350e314ad8641d9d13ad9f2dbb82999f2012c86a0c53",
+                "sha256:ae2a14e88adb05e51056b3ceaba6af7dccee9a987af4f2bae6243b51ba66a018",
+                "sha256:fd2315f0cf242aa3776d71f69fbe78d4088999ef9fc2df1de5cb513606be1215",
+                "sha256:eda01226259d5df53a10c6b6d7d760bfc37317a8037b98f17f23835fa26fc087"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "0001-01-01T00:00:00Z"
+        }
+    }
+]
+root@Lenovo:~# docker run -d --rm --network none nginx
+7fc3e94e32536bbcf051ea986eb390c234eef0323d4436fb1ca237bffc77a9a7
+root@Lenovo:~# docker inspect none nginx
+[
+    {
+        "Name": "none",
+        "Id": "11a78871f4c976b02847ba714e5b6b7d4e05e5c3e49ad3163bfc6690f747e502",
+        "Created": "2025-04-16T17:10:12.925932913Z",
+        "Scope": "local",
+        "Driver": "null",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": null
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "7fc3e94e32536bbcf051ea986eb390c234eef0323d4436fb1ca237bffc77a9a7": {
+                "Name": "nervous_meitner",
+                "EndpointID": "b6eba6e07938aeffaa3ed11e4c6bc0ddfef8e803d50f084c4999a462a2e8f057",
+                "MacAddress": "",
+                "IPv4Address": "",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    },
+    {
+        "Id": "sha256:4cad75abc83d5ca6ee22053d85850676eaef657ee9d723d7bef61179e1e1e485",
+        "RepoTags": [
+            "nginx:latest"
+        ],
+        "RepoDigests": [
+            "nginx@sha256:09369da6b10306312cd908661320086bf87fbae1b6b0c49a1f50ba531fef2eab"
+        ],
+        "Parent": "",
+        "Comment": "buildkit.dockerfile.v0",
+        "Created": "2025-02-05T21:27:16Z",
+        "DockerVersion": "",
+        "Author": "",
+        "Config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "80/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NGINX_VERSION=1.27.4",
+                "NJS_VERSION=0.8.9",
+                "NJS_RELEASE=1~bookworm",
+                "PKG_RELEASE=1~bookworm",
+                "DYNPKG_RELEASE=1~bookworm"
+            ],
+            "Cmd": [
+                "nginx",
+                "-g",
+                "daemon off;"
+            ],
+            "Image": "",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": [
+                "/docker-entrypoint.sh"
+            ],
+            "OnBuild": null,
+            "Labels": {
+                "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>"
+            },
+            "StopSignal": "SIGQUIT"
+        },
+        "Architecture": "amd64",
+        "Os": "linux",
+        "Size": 192056179,
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/2e6c9bab42f71f413765ea5eaff0524a5117a96641e1b8964530f6dea09c254a/diff:/var/lib/docker/overlay2/ed67ff930d4134bf2915872914337043f58bcdcfbe522a4600bf43c90d0e633a/diff:/var/lib/docker/overlay2/a650b2636c8b59f4f28c910472383a419d90bba5d81f7dd66ed5c9783b116ba3/diff:/var/lib/docker/overlay2/4b76bf13a07797e3a7968ad80f0d81188a43b424ef95e7d38317fc49d0f65da9/diff:/var/lib/docker/overlay2/c437846aaa4c0aa3c47d9013293ff80fbf83d09fd33bf483011ea789403ba184/diff:/var/lib/docker/overlay2/af573bb5fc84f8f3c4cba5483edd15161ee061406b8566ec5b12b557fa4e78bb/diff",
+                "MergedDir": "/var/lib/docker/overlay2/78dcc8aa9595988bac3384a815060b29b6ec64a242e74803de7254f2159af9ac/merged",
+                "UpperDir": "/var/lib/docker/overlay2/78dcc8aa9595988bac3384a815060b29b6ec64a242e74803de7254f2159af9ac/diff",
+                "WorkDir": "/var/lib/docker/overlay2/78dcc8aa9595988bac3384a815060b29b6ec64a242e74803de7254f2159af9ac/work"
+            },
+            "Name": "overlay2"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:ea680fbff095473bb8a6c867938d6d851e11ef0c177fce983ccc83440172bd72",
+                "sha256:c1a9699c65592e502a6b68876f5037b91972c4f72dac2e4e9b84f80f4b0790c2",
+                "sha256:d8d396eadc9a4f516284b8be48b1283f025d392c19e84c1c00e1187fe70bba53",
+                "sha256:27f473333e2f615c75d1350e314ad8641d9d13ad9f2dbb82999f2012c86a0c53",
+                "sha256:ae2a14e88adb05e51056b3ceaba6af7dccee9a987af4f2bae6243b51ba66a018",
+                "sha256:fd2315f0cf242aa3776d71f69fbe78d4088999ef9fc2df1de5cb513606be1215",
+                "sha256:eda01226259d5df53a10c6b6d7d760bfc37317a8037b98f17f23835fa26fc087"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "0001-01-01T00:00:00Z"
+        }
+    }
+]
+root@Lenovo:~# docker run -d --network myaliasnet --name aliasdemo --network-alias site nginx
+1dd9c8231cb14f24efb7f8349f8a42403f19bd13301e0fa3b777acd7a0ce693c
+docker: Error response from daemon: failed to set up container networking: network myaliasnet not found
+
+Run 'docker run --help' for more information
+root@Lenovo:~# docker network create --subnet=192.168.100.0/24 customnet
+bb7d7543fb7cdef9ee25c68a8b8aae7f6c5d7c0d0b4c5d5ba5c0a97e752c3a46
+root@Lenovo:~# docker run -d --name staticweb --net customnet --ip 192.168.100.100 nginx
+7c70e0d7ca157f64da191f34f4bee2d85fc6cc18c6cd7baa94ec176bee616314
+root@Lenovo:~# docker ps -a
+CONTAINER ID   IMAGE         COMMAND                  CREATED              STATUS                         PORTS     NAMES
+7c70e0d7ca15   nginx         "/docker-entrypoint.…"   28 seconds ago       Up 28 seconds                  80/tcp    staticweb
+1dd9c8231cb1   nginx         "/docker-entrypoint.…"   About a minute ago   Created                                  aliasdemo
+7fc3e94e3253   nginx         "/docker-entrypoint.…"   2 minutes ago        Up 2 minutes                             nervous_meitner
+5dcd19f06a7b   nginx         "/docker-entrypoint.…"   5 minutes ago        Up 5 minutes                             upbeat_meitner
+9d294ebec047   alpine        "sh"                     54 minutes ago       Exited (255) 38 minutes ago              container2
+9a6bf9092599   hello-world   "/hello"                 About an hour ago    Exited (0) About an hour ago             suspicious_almeida
+root@Lenovo:~#
