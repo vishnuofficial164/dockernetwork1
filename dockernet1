@@ -1,0 +1,214 @@
+
+vishnu@Lenovo:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+vishnu@Lenovo:~$ docker ps -a
+CONTAINER ID   IMAGE         COMMAND    CREATED          STATUS                      PORTS     NAMES
+9a6bf9092599   hello-world   "/hello"   27 seconds ago   Exited (0) 26 seconds ago             suspicious_almeida
+vishnu@Lenovo:~$ docker images
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+hello-world   latest    74cc54e27dc4   2 months ago   10.1kB
+vishnu@Lenovo:~$ pwd
+/home/vishnu
+vishnu@Lenovo:~$ ls
+vishnu@Lenovo:~$ cd /
+vishnu@Lenovo:/$ ls
+Docker             dev   lib                media  root                snap  usr        wslBmBIBb  wslDBpJnK  wslHEONmA  wslLiKnbb  wslNcBcoL  wslPhNGPG  wsldnaChL  wslhMjCig  wslmPJMaG  wslnkAmML
+bin                etc   lib.usr-is-merged  mnt    run                 srv   var        wslBpkJJp  wslFBJelB  wslJGkOig  wslMcMcJp  wslOddhjg  wslaDMkJp  wsleBMIeE  wslhOnBcL  wslmaLDMG  wslpPbOdg
+bin.usr-is-merged  home  lib64              opt    sbin                sys   wslAPkiPi  wslCcNoeg  wslGkplJe  wslKdlDKe  wslNGgNgL  wslPEknOG  wslaIFfng  wslfdNaFp  wsliakmlB  wslmdnDmB
+boot               init  lost+found         proc   sbin.usr-is-merged  tmp   wslAgIKKe  wslCehAlg  wslGndMhL  wslLAJNoL  wslNHgnKG  wslPPJDnA  wsldhKIng  wslhMIKig  wsllGHNDp  wslmlNang
+vishnu@Lenovo:/$ cd home
+vishnu@Lenovo:/home$ ls
+vishnu
+vishnu@Lenovo:/home$ cd vishnu
+vishnu@Lenovo:~$ ls
+vishnu@Lenovo:~$ cd desktop
+-bash: cd: desktop: No such file or directory
+vishnu@Lenovo:~$ cd /mnt/c/Users/vishn/Desktop
+-bash: cd: /mnt/c/Users/vishn/Desktop: No such file or directory
+vishnu@Lenovo:~$ cd /mnt/c/Users/vishnu/Desktop
+-bash: cd: /mnt/c/Users/vishnu/Desktop: No such file or directory
+vishnu@Lenovo:~$ cd /mnt/c/Users/vishn/OneDrive/Desktop
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop$ ls
+'Docker Desktop.lnk'                              Kubernetes_Cheatsheet.pdf                       desktop.ini                  docker
+'Eclipse IDE for Java Developers - 2024-12.lnk'  'OpenOffice 4.1.15 (en-US) Installation Files'   devops-master-class-master  'docker Project1'
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop$ cd docker Project1
+-bash: cd: too many arguments
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop$ cd "docker Project1"
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1$ ls
+ Docker2   Dockerfile   app.mjs   bindtest  'docker volume'   docker3   helpers.mjs   package.json
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1$ cd "docker Project1"
+-bash: cd: docker Project1: No such file or directory
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1$ ls
+ Docker2   Dockerfile   app.mjs   bindtest  'docker volume'   docker3   helpers.mjs   networking   package.json
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ network create --driver my_custom_-network
+network: command not found
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ network create --driver bridge my_custom_network
+network: command not found
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker network create --driver bridge my_custom_network
+32354eda611cb6b08c8669d7df7a5a4cf075f2d203dbf20b6c88c9b37b8a9f91
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker network ls
+NETWORK ID     NAME                DRIVER    SCOPE
+2b4bcb4c8dd5   bridge              bridge    local
+b6fcc2cfecd1   host                host      local
+32354eda611c   my_custom_network   bridge    local
+11a78871f4c9   none                null      local
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker network inspect my_custom_network
+[
+    {
+        "Name": "my_custom_network",
+        "Id": "32354eda611cb6b08c8669d7df7a5a4cf075f2d203dbf20b6c88c9b37b8a9f91",
+        "Created": "2025-04-16T17:26:12.830903802Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {},
+        "Labels": {}
+    }
+]
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker run -dit --name container2 --network my_custom_network alpine sh
+Unable to find image 'alpine:latest' locally
+latest: Pulling from library/alpine
+f18232174bc9: Pull complete
+Digest: sha256:a8560b36e8b8210634f77d9f7f9efd7ffa463e380b75e2e74aff4511df3ef88c
+Status: Downloaded newer image for alpine:latest
+9d294ebec0476cbc9a809e9cacc73ff338c5c25cd557c3b09cef116a75acd2f9
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker exec-it container1 ping container2
+docker: unknown command: docker exec-it
+
+Run 'docker --help' for more information
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker exec -it container1 ping container2
+Error response from daemon: No such container: container1
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker run -dit --name container1 --network my_custom_network alpine sh
+e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker exec -it container1 ping container2
+PING container2 (172.18.0.2): 56 data bytes
+64 bytes from 172.18.0.2: seq=0 ttl=64 time=0.649 ms
+64 bytes from 172.18.0.2: seq=1 ttl=64 time=0.282 ms
+64 bytes from 172.18.0.2: seq=2 ttl=64 time=0.278 ms
+64 bytes from 172.18.0.2: seq=3 ttl=64 time=0.275 ms
+64 bytes from 172.18.0.2: seq=4 ttl=64 time=0.255 ms
+64 bytes from 172.18.0.2: seq=5 ttl=64 time=0.488 ms
+64 bytes from 172.18.0.2: seq=6 ttl=64 time=0.263 ms
+64 bytes from 172.18.0.2: seq=7 ttl=64 time=0.261 ms
+^C
+--- container2 ping statistics ---
+8 packets transmitted, 8 packets received, 0% packet loss
+round-trip min/avg/max = 0.255/0.343/0.649 ms
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker network connect my_custom_network container1
+Error response from daemon: endpoint with name container1 already exists in network my_custom_network
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker network inspect my_custom_network
+[
+    {
+        "Name": "my_custom_network",
+        "Id": "32354eda611cb6b08c8669d7df7a5a4cf075f2d203dbf20b6c88c9b37b8a9f91",
+        "Created": "2025-04-16T17:26:12.830903802Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "9d294ebec0476cbc9a809e9cacc73ff338c5c25cd557c3b09cef116a75acd2f9": {
+                "Name": "container2",
+                "EndpointID": "e6fe91518347d2e94e6d60f21d8bb2b6324d9fd11fcc7bdf2fa2d2afe002cfef",
+                "MacAddress": "f2:78:d8:f5:99:b6",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": ""
+            },
+            "e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f": {
+                "Name": "container1",
+                "EndpointID": "cec7d8f63b6379e12afefa4a001855cc64651c3b11c0bd27ea8a6873ce03ae14",
+                "MacAddress": "ea:9c:69:7d:72:b9",
+                "IPv4Address": "172.18.0.3/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    }
+]
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker network disconnect my_custom_network container1
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker network connect my_custom_network container1
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$ docker network inspect my_custom_network
+[
+    {
+        "Name": "my_custom_network",
+        "Id": "32354eda611cb6b08c8669d7df7a5a4cf075f2d203dbf20b6c88c9b37b8a9f91",
+        "Created": "2025-04-16T17:26:12.830903802Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv4": true,
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {
+            "9d294ebec0476cbc9a809e9cacc73ff338c5c25cd557c3b09cef116a75acd2f9": {
+                "Name": "container2",
+                "EndpointID": "e6fe91518347d2e94e6d60f21d8bb2b6324d9fd11fcc7bdf2fa2d2afe002cfef",
+                "MacAddress": "f2:78:d8:f5:99:b6",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": ""
+            },
+            "e6f2861db819a0d47311cf3fe96318a2d407ba318e48ad5e3e3c216e477e4f5f": {
+                "Name": "container1",
+                "EndpointID": "c93c6cc952b9666c348ea6f3f63bb4b0f9a4939be0562891a2c87bc8ecdb1511",
+                "MacAddress": "16:62:00:84:38:4c",
+                "IPv4Address": "172.18.0.3/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    }
+]
+vishnu@Lenovo:/mnt/c/Users/vishn/OneDrive/Desktop/docker Project1/networking$
